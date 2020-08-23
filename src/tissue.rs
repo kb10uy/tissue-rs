@@ -5,7 +5,7 @@ use std::error::Error;
 
 use chrono::prelude::*;
 use serde::Deserialize;
-use serde_json::{from_value, Value, to_string};
+use serde_json::{from_value, Value};
 
 /// チェックインの成功レスポンスに含まれるチェックインデータ
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
@@ -62,7 +62,10 @@ impl IncomingEndpoint {
         checkin: &Checkin,
     ) -> Result<CheckinResponse, Box<dyn Error + Send + Sync + 'static>> {
         let target_url = format!("https://{}/api/webhooks/checkin/{}", self.domain, self.id);
-        let response: Value = surf::post(target_url).body_json(checkin)?.recv_json().await?;
+        let response: Value = surf::post(target_url)
+            .body_json(checkin)?
+            .recv_json()
+            .await?;
 
         IncomingEndpoint::parse_response(&response)
     }

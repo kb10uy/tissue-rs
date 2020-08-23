@@ -5,6 +5,7 @@ mod tissue;
 pub use crate::{
     checkin::{Checkin, CheckinBuilder},
     error::CheckinError,
+    tissue::{CheckinResponse, IncomingEndpoint, ReceivedCheckin},
 };
 
 /*
