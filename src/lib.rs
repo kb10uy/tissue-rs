@@ -1,12 +1,11 @@
 mod checkin;
 mod error;
+mod tissue;
 
 pub use crate::{
     checkin::{Checkin, CheckinBuilder},
     error::CheckinError,
 };
-
-pub struct Endpoint(String);
 
 /*
 #[cfg(test)]

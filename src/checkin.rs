@@ -3,11 +3,12 @@
 use crate::error::CheckinError;
 
 use chrono::prelude::*;
+use serde::Serialize;
 
 /// 有効なチェックインのパラメーターを表す。
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct Checkin<Tz: TimeZone> {
-    checked_in_at: DateTime<Tz>,
+#[derive(Debug, PartialEq, Eq, Hash, Serialize)]
+pub struct Checkin {
+    checked_in_at: DateTime<FixedOffset>,
     note: Option<String>,
     link: Option<String>,
     tags: Box<[String]>,
@@ -15,9 +16,9 @@ pub struct Checkin<Tz: TimeZone> {
     is_too_sensitive: Option<bool>,
 }
 
-impl<Tz: TimeZone> Checkin<Tz> {
+impl Checkin {
     /// チェックイン時刻
-    pub fn checked_in_at(&self) -> DateTime<Tz> {
+    pub fn checked_in_at(&self) -> DateTime<FixedOffset> {
         self.checked_in_at.clone()
     }
 
@@ -49,8 +50,8 @@ impl<Tz: TimeZone> Checkin<Tz> {
 
 /// チェックインのパラメーターを構築する。
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CheckinBuilder<Tz: TimeZone> {
-    checked_in_at: DateTime<Tz>,
+pub struct CheckinBuilder {
+    checked_in_at: DateTime<FixedOffset>,
     note: Option<String>,
     link: Option<String>,
     tags: Vec<String>,
@@ -58,11 +59,11 @@ pub struct CheckinBuilder<Tz: TimeZone> {
     is_too_sensitive: Option<bool>,
 }
 
-impl<Tz: TimeZone> CheckinBuilder<Tz> {
+impl CheckinBuilder {
     /// ローカルタイムゾーンでチェックインを作成する。
-    pub fn new_local() -> CheckinBuilder<Local> {
+    pub fn new_local() -> CheckinBuilder {
         CheckinBuilder {
-            checked_in_at: Local::now(),
+            checked_in_at: Local::now().into(),
             note: None,
             link: None,
             tags: vec![],
@@ -72,9 +73,9 @@ impl<Tz: TimeZone> CheckinBuilder<Tz> {
     }
 
     /// UTC でチェックインを作成する。
-    pub fn new_utc() -> CheckinBuilder<Utc> {
+    pub fn new_utc() -> CheckinBuilder {
         CheckinBuilder {
-            checked_in_at: Utc::now(),
+            checked_in_at: Utc::now().into(),
             note: None,
             link: None,
             tags: vec![],
@@ -84,7 +85,7 @@ impl<Tz: TimeZone> CheckinBuilder<Tz> {
     }
 
     /// `DateTime` を指定してチェックインを作成する。
-    pub fn with_datetime(checked_in_at: DateTime<Tz>) -> CheckinBuilder<Tz> {
+    pub fn with_datetime(checked_in_at: DateTime<FixedOffset>) -> CheckinBuilder {
         CheckinBuilder {
             checked_in_at,
             note: None,
@@ -151,7 +152,7 @@ impl<Tz: TimeZone> CheckinBuilder<Tz> {
     }
 
     /// チェックインパラメーターを生成する。
-    pub fn build(self) -> Checkin<Tz> {
+    pub fn build(self) -> Checkin {
         Checkin {
             checked_in_at: self.checked_in_at,
             note: self.note,
