@@ -99,7 +99,7 @@ impl CheckinBuilder {
     /// チェックインノートを設定する。
     /// 2000 bytes 以上の場合は `Err(CheckinError::TooLong)` が返る。
     pub fn note(&mut self, text: &str) -> Result<(), CheckinError> {
-        if text.len() <= 500 {
+        if text.chars().count() <= 500 {
             self.note = Some(text.into());
             Ok(())
         } else {
@@ -110,7 +110,7 @@ impl CheckinBuilder {
     /// オカズリンクを設定する。
     /// 500 bytes 以上の場合は `Err(CheckinError::TooLong)` が返る。
     pub fn link(&mut self, link: &str) -> Result<(), CheckinError> {
-        if link.len() <= 2000 {
+        if link.chars().count() <= 2000 {
             self.link = Some(link.into());
             Ok(())
         } else {
