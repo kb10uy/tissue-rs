@@ -1,3 +1,14 @@
+mod checkin;
+mod error;
+
+pub use crate::{
+    checkin::{Checkin, CheckinBuilder},
+    error::CheckinError,
+};
+
+pub struct Endpoint(String);
+
+/*
 #[cfg(test)]
 mod tests {
     #[test]
@@ -5,3 +16,4 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
+*/
