@@ -1,6 +1,7 @@
 //! チェックインパラメーター関連の型を集約する。
 
 use crate::error::CheckinError;
+use std::fmt::Display;
 
 use chrono::prelude::*;
 use serde::Serialize;
@@ -8,7 +9,7 @@ use serde::Serialize;
 /// 有効なチェックインのパラメーターを表す。
 #[derive(Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct Checkin {
-    checked_in_at: DateTime<FixedOffset>,
+    checked_in_at: String,
     note: Option<String>,
     link: Option<String>,
     tags: Box<[String]>,
@@ -18,8 +19,8 @@ pub struct Checkin {
 
 impl Checkin {
     /// チェックイン時刻
-    pub fn checked_in_at(&self) -> DateTime<FixedOffset> {
-        self.checked_in_at.clone()
+    pub fn checked_in_at(&self) -> &str {
+        &self.checked_in_at
     }
 
     /// チェックインノート
@@ -50,8 +51,11 @@ impl Checkin {
 
 /// チェックインのパラメーターを構築する。
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CheckinBuilder {
-    checked_in_at: DateTime<FixedOffset>,
+pub struct CheckinBuilder<Tz: TimeZone>
+where
+    <Tz as TimeZone>::Offset: Display,
+{
+    checked_in_at: DateTime<Tz>,
     note: Option<String>,
     link: Option<String>,
     tags: Vec<String>,
@@ -59,11 +63,14 @@ pub struct CheckinBuilder {
     is_too_sensitive: Option<bool>,
 }
 
-impl CheckinBuilder {
+impl<Tz: TimeZone> CheckinBuilder<Tz>
+where
+    <Tz as TimeZone>::Offset: Display,
+{
     /// ローカルタイムゾーンでチェックインを作成する。
-    pub fn new_local() -> CheckinBuilder {
+    pub fn new_local() -> CheckinBuilder<Local> {
         CheckinBuilder {
-            checked_in_at: Local::now().into(),
+            checked_in_at: Local::now(),
             note: None,
             link: None,
             tags: vec![],
@@ -73,9 +80,9 @@ impl CheckinBuilder {
     }
 
     /// UTC でチェックインを作成する。
-    pub fn new_utc() -> CheckinBuilder {
+    pub fn new_utc() -> CheckinBuilder<Utc> {
         CheckinBuilder {
-            checked_in_at: Utc::now().into(),
+            checked_in_at: Utc::now(),
             note: None,
             link: None,
             tags: vec![],
@@ -85,7 +92,7 @@ impl CheckinBuilder {
     }
 
     /// `DateTime` を指定してチェックインを作成する。
-    pub fn with_datetime(checked_in_at: DateTime<FixedOffset>) -> CheckinBuilder {
+    pub fn with_datetime(checked_in_at: DateTime<Tz>) -> CheckinBuilder<Tz> {
         CheckinBuilder {
             checked_in_at,
             note: None,
@@ -154,7 +161,9 @@ impl CheckinBuilder {
     /// チェックインパラメーターを生成する。
     pub fn build(self) -> Checkin {
         Checkin {
-            checked_in_at: self.checked_in_at,
+            checked_in_at: self
+                .checked_in_at
+                .to_rfc3339_opts(SecondsFormat::Secs, true),
             note: self.note,
             link: self.link,
             tags: self.tags.into_boxed_slice(),

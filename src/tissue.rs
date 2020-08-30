@@ -79,7 +79,7 @@ impl IncomingEndpoint {
                 let received_checkin = from_value(value["checkin"].clone())?;
                 Ok(CheckinResponse::Success(received_checkin))
             }
-            422 => {
+            404 | 422 => {
                 let error_object = &value["error"];
                 if error_object["violations"].is_array() {
                     // バリデーションエラー
@@ -91,7 +91,9 @@ impl IncomingEndpoint {
                     Ok(CheckinResponse::OtherError(message.into()))
                 }
             }
-            _ => Err("Unknown status code".into()),
+            otherwise => {
+                Err(format!("Unknown status code: {}, response: {}", otherwise, value).into())
+            }
         }
     }
 }

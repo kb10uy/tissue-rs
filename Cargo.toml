@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["kb10uy <kb10uy@kb10uy.org>"]
 edition = "2018"
 
+# dependencies
+
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
@@ -17,3 +19,11 @@ features = ["serde"]
 
 [dependencies.surf]
 version = "2.0.0-alpha.4"
+
+# dev-dependencies
+
+[dev-dependencies.async-std]
+version = "1.6"
+
+[dev-dependencies.chrono-tz]
+git = "https://github.com/chronotope/chrono-tz"
