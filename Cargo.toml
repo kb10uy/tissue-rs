@@ -1,29 +1,29 @@
 [package]
 name = "tissue-rs"
-version = "0.1.0"
-authors = ["kb10uy <kb10uy@kb10uy.org>"]
+version = "0.1.1"
+authors = ["Yū Kobayashi <kb10uy@kb10uy.org>"]
 edition = "2018"
 
 # dependencies
 
 [dependencies.serde]
-version = "1.0"
+version = "1.0.126"
 features = ["derive"]
 
 [dependencies.serde_json]
-version = "1.0"
+version = "1.0.64"
 
 [dependencies.chrono]
-version = "0.4"
+version = "0.4.19"
 features = ["serde"]
 
 [dependencies.surf]
-version = "2.0.0-alpha.4"
+version = "2.2.0"
 
 # dev-dependencies
 
 [dev-dependencies.async-std]
-version = "1.6"
+version = "1.9.0"
 
 [dev-dependencies.chrono-tz]
 git = "https://github.com/chronotope/chrono-tz"

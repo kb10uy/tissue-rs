@@ -1,4 +1,4 @@
-//! チェックインパラメーター関連の型を集約する。
+//! Contains checkin types.
 
 use crate::error::CheckinError;
 use std::fmt::Display;
@@ -6,7 +6,7 @@ use std::fmt::Display;
 use chrono::prelude::*;
 use serde::Serialize;
 
-/// 有効なチェックインのパラメーターを表す。
+/// Describes a valid checkin.
 #[derive(Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct Checkin {
     checked_in_at: String,
@@ -18,38 +18,38 @@ pub struct Checkin {
 }
 
 impl Checkin {
-    /// チェックイン時刻
+    /// Timestamp of checkin.
     pub fn checked_in_at(&self) -> &str {
         &self.checked_in_at
     }
 
-    /// チェックインノート
+    /// Notes.
     pub fn note(&self) -> Option<&String> {
         self.note.as_ref()
     }
 
-    /// オカズリンク
+    /// Link.
     pub fn link(&self) -> Option<&String> {
         self.link.as_ref()
     }
 
-    /// タグ
+    /// Tag(s).
     pub fn tags(&self) -> impl Iterator<Item = &String> {
         self.tags.iter()
     }
 
-    /// 非公開フラグ
+    /// Whether it is private or not.
     pub fn is_private(&self) -> Option<bool> {
         self.is_private
     }
 
-    /// 過激フラグ
+    /// Whether it is too sensitive or not.
     pub fn is_too_sensitive(&self) -> Option<bool> {
         self.is_too_sensitive
     }
 }
 
-/// チェックインのパラメーターを構築する。
+/// Builder for `Checkin`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CheckinBuilder<Tz: TimeZone>
 where
@@ -67,7 +67,7 @@ impl<Tz: TimeZone> CheckinBuilder<Tz>
 where
     <Tz as TimeZone>::Offset: Display,
 {
-    /// ローカルタイムゾーンでチェックインを作成する。
+    /// Creates a new builder with local timezone.
     pub fn new_local() -> CheckinBuilder<Local> {
         CheckinBuilder {
             checked_in_at: Local::now(),
@@ -79,7 +79,7 @@ where
         }
     }
 
-    /// UTC でチェックインを作成する。
+    /// Creates a new builder with UTC.
     pub fn new_utc() -> CheckinBuilder<Utc> {
         CheckinBuilder {
             checked_in_at: Utc::now(),
@@ -91,7 +91,7 @@ where
         }
     }
 
-    /// `DateTime` を指定してチェックインを作成する。
+    /// Creates a new builder with specified `DateTime`.
     pub fn with_datetime(checked_in_at: DateTime<Tz>) -> CheckinBuilder<Tz> {
         CheckinBuilder {
             checked_in_at,
@@ -103,8 +103,8 @@ where
         }
     }
 
-    /// チェックインノートを設定する。
-    /// 2000 bytes 以上の場合は `Err(CheckinError::TooLong)` が返る。
+    /// Sets checkin note.
+    /// Returns `Err(CheckinError::TooLong)` if `text` >= 2000 bytes.
     pub fn note(&mut self, text: &str) -> Result<(), CheckinError> {
         if text.chars().count() <= 500 {
             self.note = Some(text.into());
@@ -114,8 +114,8 @@ where
         }
     }
 
-    /// オカズリンクを設定する。
-    /// 500 bytes 以上の場合は `Err(CheckinError::TooLong)` が返る。
+    /// Sets checkin link.
+    /// Returns `Err(CheckinError::TooLong)` if `text` >= 500 bytes.
     pub fn link(&mut self, link: &str) -> Result<(), CheckinError> {
         if link.chars().count() <= 2000 {
             self.link = Some(link.into());
@@ -125,8 +125,8 @@ where
         }
     }
 
-    /// タグを設定する。先頭と末尾の空白は削除される。
-    /// 途中に空白が含まれている場合、 `Err(CheckinError::HasWhitespaces)` が返る。
+    /// Sets tags. For each tag, leading/trailing whitespaces will be removed.
+    /// Returns `Err(CheckinError::HasWhitespaces)` if whitespaces found in the middle.
     pub fn tags<T: AsRef<str>, I: IntoIterator<Item = T>>(
         &mut self,
         tags: I,
@@ -148,17 +148,17 @@ where
         Ok(())
     }
 
-    /// 非公開フラグを設定する。
+    /// Sets private flag.
     pub fn is_private(&mut self, is_private: bool) {
         self.is_private = Some(is_private);
     }
 
-    /// 過激フラグを設定する。
+    /// Sets too-sensitive flag.
     pub fn is_too_sensitive(&mut self, is_too_sensitive: bool) {
         self.is_too_sensitive = Some(is_too_sensitive);
     }
 
-    /// チェックインパラメーターを生成する。
+    /// Builds `Checkin`.
     pub fn build(self) -> Checkin {
         Checkin {
             checked_in_at: self

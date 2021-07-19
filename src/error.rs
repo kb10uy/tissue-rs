@@ -1,17 +1,17 @@
-//! エラー関連の型や操作を集約している。
+//! Contains error types.
 
 use std::{
     error::Error,
     fmt::{Display, Formatter, Result as FmtResult},
 };
 
-/// チェックインデータのエラーを表す。
+/// Describes an error on checkins.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CheckinError {
-    /// パラメーターが長すぎる
+    /// Too long parameters
     TooLong,
 
-    /// タグに空白が含まれている
+    /// Some tag have whitespaces
     HasWhitespaces,
 }
 
